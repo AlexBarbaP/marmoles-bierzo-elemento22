@@ -4,7 +4,7 @@ services:
   apache:
     build:
       args:
-        - APP_DOC_ROOT=/var/www/public
+        - APP_DOC_ROOT=/var/www/host/src/public
         - APP_ENV=dev #dev|ci|prod
         - APP_NAME=AppName
     environment:
