@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  apache:
+    build:
+      args:
+        - APP_DOC_ROOT=/var/www/public
+        - APP_ENV=dev #dev|ci|prod
+        - APP_NAME=AppName
+    environment:
+      - APP_DOMAIN=AppDomain.local
+      - PHP_PROXY_ALIAS=php
+      - PHP_PROXY_PORT=9000
+      - APACHE_SERVERNAME=apacheservername-server
+      - APACHE_SERVER_ADMIN=info@example.com
+    ports:
+      - 80:80
+      - 443:443
+      - 9997:80
+    volumes:  #dev|ci|prod
+      - ./docker/apache/dev/conf/cert:/usr/local/apache2/conf/cert/
+  mysql:
+      container_name: XX-mysql
+      ports:
+        - X3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root-passwd
+      - MYSQL_DATABASE=db-name
+      - MYSQL_USER=db-user
+      - MYSQL_PASSWORD=db-user-passwd
+  php:
+    build:
+      args:
+        - WORKDIR=/var/www
+    environment:
+      - APP_ENV=dev #dev|ci|prod

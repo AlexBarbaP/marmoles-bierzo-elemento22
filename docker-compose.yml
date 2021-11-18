@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  apache:
+    build:
+      dockerfile: ./docker/apache/Dockerfile
+      context: .
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    networks:
+      marmolesbierzo-network:
+        aliases:
+          - apache
+        ipv4_address: 172.30.0.10
+    volumes:
+      - .:/var/www
+
+  mysql:
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    image: mysql:5.7
+#    environment:
+#      - MYSQL_TESTING_DATABASE=marmolesbierzo-testing
+    networks:
+      marmolesbierzo-network:
+        aliases:
+          - mysql
+        ipv4_address: 172.30.0.20
+    volumes:
+#      - ./docker/mysql/init/01-databases.sql:/docker-entrypoint-initdb.d/01-databases.sql
+      - ./docker/mysql/conf/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+      - myapp_mysql-data:/var/lib/mysql
+
+  php:
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      context: .
+    expose:
+      - 9000
+    networks:
+      marmolesbierzo-network:
+        aliases:
+          - php
+    volumes:
+      - .:/var/www
+
+networks:
+  marmolesbierzo-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/16
+
+volumes:
+  myapp_mysql-data:
+    driver: local
